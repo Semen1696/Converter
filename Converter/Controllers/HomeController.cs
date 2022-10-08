@@ -37,9 +37,6 @@ namespace Converter.Controllers
         public async Task<IActionResult> DownloadFile(string path)
         {
             var bytes = await System.IO.File.ReadAllBytesAsync(path);
-            //var stream = new MemoryStream(bytes);
-            //var result = new FileStreamResult(stream, "application/pdf");
-            //result.FileDownloadName = Path.GetFileName(path);
             return File(bytes, "application/pdf");
         }
 
