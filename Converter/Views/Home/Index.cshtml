@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="d-flex justify-content-center">
+    
+    <input type="file" id="file-input">
+    <div class="loader" id="loader"></div>
+    <button id="download">Download</button>
+
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var path;
+            document.getElementById("loader").style.display = "none";
+            document.getElementById("download").style.display = "none";
+            $('#file-input').change(function(e){
+                document.getElementById("loader").style.display = "block";
+                var file = e.target.files[0];
+                if (!file) {
+                    return;
+                }
+                var formData = new FormData();
+                formData.append("file", file)
+                $.ajax({
+                    url: "/Home/ConvertFile/",
+                    method: 'POST',
+                    type: "POST",
+                    dataType: "json",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        path = data.message
+                        console.log(path)
+                        document.getElementById("loader").style.display = "none";
+                        document.getElementById("download").style.display = "block";
+                        //$("#loader").replaceWith("<button id='download'>Download</button>");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.responseText)
+                    },
+
+                })
+            })
+
+            $('#download').click(function(){
+                console.log('1');
+                $.ajax({
+                    url: "/Home/DownloadFile/",
+                    xhrFields: { responseType: 'blob' },
+                    type: "POST",
+                    data: { path: path },
+                    success: function (data) {
+
+                        var a = document.createElement('a');
+                        var url = window.URL.createObjectURL(data);
+                        a.href = url;
+                        a.download = 'converted.pdf';
+                        document.body.append(a);
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                    }
+
+                })
+            })
+            //function download() {
+            //    $.ajax({
+            //        url: "/Home/DownloadFile/",
+            //        xhrFields: { responseType: 'blob' },
+            //        type: "POST",
+            //        data: { path: path },
+            //        success: function (data) {
+
+            //            var a = document.createElement('a');
+            //            var url = window.URL.createObjectURL(data);
+            //            a.href = url;
+            //            a.download = 'converted.pdf';
+            //            document.body.append(a);
+            //            a.click();
+            //            a.remove();
+            //            window.URL.revokeObjectURL(url);
+            //        }
+
+            //    })
+            //}
+
+            
+        })
+
+    </script>
+}
+
